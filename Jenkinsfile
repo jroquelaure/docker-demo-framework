@@ -6,7 +6,7 @@ pipeline {
         parallel(
           "Init Workspace": {
             deleteDir()
-            sh 'docker rmi $dockerRepo/nginx'
+            sh 'docker rmi $dockerRepo/nginx || true'
             
           },
           "Get sources": {
