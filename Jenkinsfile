@@ -3,8 +3,23 @@ pipeline {
   stages {
     stage('Init Workspace') {
       steps {
-        deleteDir()
-        sh 'docker rmi $dockerRepo/nginx'
+        parallel(
+          "Init Workspace": {
+            deleteDir()
+            sh 'docker rmi $dockerRepo/nginx'
+            
+          },
+          "Get sources": {
+            git(url: 'https://github.com/jroquelaure/docker-lifecycle.git', branch: 'master')
+            
+          }
+        )
+      }
+    }
+    stage('Config environment') {
+      steps {
+        sh '''sed -ie 's/ubuntu:5001/$dockerRepo/g' docker-framework/DockerFile
+sed -ie 's/ubuntu:5001/$params.dockerRepo/g' docker-framework/framework-test/Dockerfile'''
       }
     }
   }
@@ -15,8 +30,8 @@ pipeline {
     dockerRepo = 'ubuntu:5001'
     xray = 'false'
     server = Artifactory.server($artifactoryInstance)
-    authUrl = "$server.url/api/npm/auth"
-    bowerUrl = "$server.url/api/bower/bower-dev"
-    npmUrl = "$server.url/api/npm/npm-prod"
+    authUrl = '$server.url/api/npm/auth'
+    bowerUrl = '$server.url/api/bower/bower-dev'
+    npmUrl = '$server.url/api/npm/npm-prod'
   }
 }
