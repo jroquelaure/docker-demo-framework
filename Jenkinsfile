@@ -5,12 +5,6 @@ pipeline {
       steps {
         deleteDir()
         sh 'docker rmi $dockerRepo/nginx'
-        def server = Artifactory.server($artifactoryInstance)
-        def username = $artifactoryUserName
-        def password = $apiKey
-        def authUrl = "$server.url/api/npm/auth"
-        def bowerUrl = "$server.url/api/bower/bower-dev"
-        def npmUrl = "$server.url/api/npm/npm-prod"
       }
     }
   }
@@ -20,5 +14,11 @@ pipeline {
     artifactoryUserName = 'jenkins'
     dockerRepo = 'ubuntu:5001'
     xray = 'false'
+    server = Artifactory.server($artifactoryInstance)
+    username = $artifactoryUserName
+    password = $apiKey
+    authUrl = "$server.url/api/npm/auth"
+    bowerUrl = "$server.url/api/bower/bower-dev"
+    npmUrl = "$server.url/api/npm/npm-prod"
   }
 }
