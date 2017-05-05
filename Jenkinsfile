@@ -22,7 +22,7 @@ pipeline {
 sed -ie 's/ubuntu:5001/$dockerRepo/g' docker-framework/framework-test/Dockerfile'''
       }
     }
-    stage('Build Base Image') {
+    stage ('Build Base Image') {
          def downloadSpec = """{
             "files": [
             {
