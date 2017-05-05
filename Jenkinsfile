@@ -35,9 +35,7 @@ sed -ie 's/ubuntu:5001/$dockerRepo/g' docker-framework/framework-test/Dockerfile
             ]
           }"""
           def buildInfo = server.download(downloadSpec)
-        }
-        
-        script {
+          
           def artDocker= Artifactory.docker(username, apiKey)
           
           docker.build(dockerRepo + "/docker-framework:$buildInfo.number", "-f docker-framework/DockerFile ./docker-framework/")
