@@ -5,6 +5,10 @@ pipeline {
       steps {
         deleteDir()
         sh 'docker rmi $dockerRepo/nginx'
+        
+      }
+      steps {
+        def server = Artifactory.server(params.artifactoryInstance)
       }
     }
   }
