@@ -23,8 +23,7 @@ sed -ie 's/ubuntu:5001/$dockerRepo/g' docker-framework/framework-test/Dockerfile
       }
     }
     stage('Build Base Image') {
-      steps {
-         downloadSpec = """{
+         def downloadSpec = """{
             "files": [
             {
                 "pattern": "generic-local/java/*jdk*.tar.gz",
@@ -33,11 +32,10 @@ sed -ie 's/ubuntu:5001/$dockerRepo/g' docker-framework/framework-test/Dockerfile
             }
         ]
         }"""
-        buildInfo = server.download(downloadSpec)
-        artDocker= Artifactory.docker(username, apiKey)
+        def buildInfo = server.download(downloadSpec)
+        def artDocker= Artifactory.docker(username, apiKey)
              
         docker.build(dockerRepo + "/docker-framework:$buildInfo.number", "-f docker-framework/DockerFile ./docker-framework/") 
-      }
     }
   }
   environment {
