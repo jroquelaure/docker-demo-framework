@@ -5,10 +5,12 @@ pipeline {
       steps {
         deleteDir()
         sh 'docker rmi $dockerRepo/nginx'
-        
-      }
-      steps {
-        def server = Artifactory.server(params.artifactoryInstance)
+        def server = Artifactory.server($artifactoryInstance)
+        def username = $artifactoryUserName
+        def password = $apiKey
+        def authUrl = "$server.url/api/npm/auth"
+        def bowerUrl = "$server.url/api/bower/bower-dev"
+        def npmUrl = "$server.url/api/npm/npm-prod"
       }
     }
   }
