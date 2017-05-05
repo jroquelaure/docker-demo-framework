@@ -41,6 +41,7 @@ sed -ie 's/ubuntu:5001/$dockerRepo/g' docker-framework/framework-test/Dockerfile
           docker.build(dockerRepo + "/docker-framework:$buildInfo.number", "-f docker-framework/DockerFile ./docker-framework/")
         }
         
+        sh 'echo "et la c\'est une etape ca"'
       }
     }
     stage('Push image to Artifactory') {
