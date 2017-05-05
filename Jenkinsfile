@@ -29,9 +29,9 @@ sed -ie 's/ubuntu:5001/$params.dockerRepo/g' docker-framework/framework-test/Doc
     username = 'jenkins'
     dockerRepo = 'ubuntu:5001'
     xray = 'false'
-    server = Artifactory.server($artifactoryInstance)
     authUrl = '$server.url/api/npm/auth'
     bowerUrl = '$server.url/api/bower/bower-dev'
     npmUrl = '$server.url/api/npm/npm-prod'
+    server = 'Artifactory.server($artifactoryInstance)'
   }
 }
