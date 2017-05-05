@@ -23,19 +23,23 @@ sed -ie 's/ubuntu:5001/$dockerRepo/g' docker-framework/framework-test/Dockerfile
       }
     }
     stage ('Build Base Image') {
-         def downloadSpec = """{
-            "files": [
-            {
-                "pattern": "generic-local/java/*jdk*.tar.gz",
-                "target": "docker-framework/jdk/jdk-8-linux-x64.tar.gz",
-                "flat": "true"
-            }
-        ]
-        }"""
-        def buildInfo = server.download(downloadSpec)
-        def artDocker= Artifactory.docker(username, apiKey)
-             
-        docker.build(dockerRepo + "/docker-framework:$buildInfo.number", "-f docker-framework/DockerFile ./docker-framework/") 
+      steps {
+        script {
+            def downloadSpec = """{
+              "files": [
+              {
+                  "pattern": "generic-local/java/*jdk*.tar.gz",
+                  "target": "docker-framework/jdk/jdk-8-linux-x64.tar.gz",
+                  "flat": "true"
+              }
+          ]
+          }"""
+          def buildInfo = server.download(downloadSpec)
+          def artDocker= Artifactory.docker(username, apiKey)
+              
+          docker.build(dockerRepo + "/docker-framework:$buildInfo.number", "-f docker-framework/DockerFile ./docker-framework/") 
+        }
+      }
     }
   }
   environment {
