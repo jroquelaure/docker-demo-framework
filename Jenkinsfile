@@ -19,7 +19,24 @@ pipeline {
     stage('Config environment') {
       steps {
         sh '''sed -ie 's/ubuntu:5001/$dockerRepo/g' docker-framework/DockerFile
-sed -ie 's/ubuntu:5001/$params.dockerRepo/g' docker-framework/framework-test/Dockerfile'''
+sed -ie 's/ubuntu:5001/$dockerRepo/g' docker-framework/framework-test/Dockerfile'''
+      }
+    }
+    stage('Build Base Image') {
+      steps {
+         downloadSpec = """{
+            "files": [
+            {
+                "pattern": "generic-local/java/*jdk*.tar.gz",
+                "target": "docker-framework/jdk/jdk-8-linux-x64.tar.gz",
+                "flat": "true"
+            }
+        ]
+        }"""
+        buildInfo = server.download(downloadSpec)
+        artDocker= Artifactory.docker(username, apiKey)
+             
+        docker.build(dockerRepo + "/docker-framework:$buildInfo.number", "-f docker-framework/DockerFile ./docker-framework/") 
       }
     }
   }
