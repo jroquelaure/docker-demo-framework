@@ -76,11 +76,11 @@ sed -ie "s/ubuntu:5001/${dockerRepo}/g" docker-framework/framework-test/Dockerfi
           
           sh "echo $server.url/api/npm/auth"
           
-          sh "curl -S -u${username}:${apiKey} ${authUrl} > .npmrc"
+          sh "curl -S -u$username:apiKey $server.url/api/npm/auth > .npmrc"
           
           sh("""echo '{
             "directory": "app/bower_components",
-            "registry" : "http://${username}:${apiKey}@$server.url/artifactory/api/bower/bower-dev",
+            "registry" : "http://$username:$apiKey@$server.url/artifactory/api/bower/bower-dev",
             "resolvers" : [ "bower-art-resolver" ]
           }' > .bowerrc""".toString())
           
@@ -96,7 +96,7 @@ sed -ie "s/ubuntu:5001/${dockerRepo}/g" docker-framework/framework-test/Dockerfi
           server.download(downloadSpec)
           
           sh "mkdir -p docker-framework/framework-test/ui"
-          sh "curl -u${username}:${apiKey} \"$server.url/npm-prod/org/jfrog/frogsui/frogsui-\\[RELEASE\\].tgz\" -o docker-framework/framework-test/ui/frogsui.tgz"
+          sh "curl -u$username:$apiKey \"$server.url/npm-prod/org/jfrog/frogsui/frogsui-\\[RELEASE\\].tgz\" -o docker-framework/framework-test/ui/frogsui.tgz"
           
           sh "tar -xvzf docker-framework/framework-test/ui/frogsui.tgz -C docker-framework/framework-test/ui/"
           sh "mv docker-framework/framework-test/ui/package docker-framework/framework-test/ui/frogsui"
