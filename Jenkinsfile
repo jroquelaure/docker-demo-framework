@@ -57,9 +57,10 @@ sed -ie "s/ubuntu:5001/${dockerRepo}/g" docker-framework/framework-test/Dockerfi
           buildInfo.append(dockerInfo)
           
           server.publishBuildInfo(buildInfo)
+          
+          sh("""curl -H 'X-JFrog-Art-Api:${apiKey}' $server.url/api/docker/docker-dev-local/v2/promote -H "Content-Type:application/json" -d '{"targetRepo" : "docker-dev-local", "dockerRepository" : "docker-framework", "tag" : "${env.BUILD_ID}", "targetTag" : "latest", "copy": true }' """)
         }
         
-        sh '"""curl -H \'X-JFrog-Art-Api:${apiKey}\' $server.url/api/docker/docker-dev-local/v2/promote -H "Content-Type:application/json" -d \'{"targetRepo" : "docker-dev-local", "dockerRepository" : "docker-framework", "tag" : "${env.BUILD_ID}", "targetTag" : "latest", "copy": true }\' """'
       }
     }
     stage('Test Image') {
