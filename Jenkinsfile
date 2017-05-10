@@ -74,7 +74,7 @@ sed -ie "s/ubuntu:5001/${dockerRepo}/g" docker-framework/framework-test/Dockerfi
           sh 'cat docker-app/jar/version.txt'
           env.JARVER=readFile('docker-app/jar/version.txt')
           
-          sh echo "${authUrl}"
+          sh "echo '${authUrl}'"
           
           sh "curl -S -u${username}:${apiKey} ${authUrl} > .npmrc"
           
