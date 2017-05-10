@@ -22,8 +22,8 @@ pipeline {
     }
     stage('Config environment') {
       steps {
-        sh '''sed -ie 's/ubuntu:5001/${dockerRepo}/g' docker-framework/DockerFile
-sed -ie 's/ubuntu:5001/${dockerRepo}/g' docker-framework/framework-test/Dockerfile'''
+        sh '''sed -ie "s/ubuntu:5001/${dockerRepo}/g" docker-framework/DockerFile
+sed -ie "s/ubuntu:5001/${dockerRepo}/g" docker-framework/framework-test/Dockerfile'''
       }
     }
     stage('Build Base Image') {
