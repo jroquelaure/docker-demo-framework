@@ -34,7 +34,7 @@ sed -ie 's/ubuntu:5001/$dockerRepo/g' docker-framework/framework-test/Dockerfile
               }
             ]
           }"""
-          def buildInfo = server.download(downloadSpec)
+          def buildInfo = $server.download(downloadSpec)
         }
         
         script {
