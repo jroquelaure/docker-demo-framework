@@ -66,7 +66,7 @@ sed -ie "s/ubuntu:5001/${dockerRepo}/g" docker-framework/framework-test/Dockerfi
     stage('Test Image') {
       steps {
         script {
-          def curlstr="curl -H 'X-JFrog-Art-Api:"+password+"' '${server}.url"
+          def curlstr="curl -H 'X-JFrog-Art-Api:${apiKey}' '${server}.url"
           def jarverstr = curlstr+ "/api/search/latestVersion?g=com.jfrog&a=frogsws&repos=libs-release'"
           
           sh jarverstr +' > docker-app/jar/version.txt'
