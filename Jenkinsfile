@@ -40,9 +40,7 @@ sed -ie "s/ubuntu:5001/${dockerRepo}/g" docker-framework/framework-test/Dockerfi
           }"""
           
           server = Artifactory.server(artifactoryInstance)
-          def buildInfo = server.download(downloadSpec)
-          
-          def artDocker= Artifactory.docker(username, apiKey)
+          buildInfo = server.download(downloadSpec)
           
           docker.build(dockerRepo + "/docker-framework:${env.BUILD_ID}", "-f docker-framework/DockerFile ./docker-framework/")
         }
@@ -52,8 +50,12 @@ sed -ie "s/ubuntu:5001/${dockerRepo}/g" docker-framework/framework-test/Dockerfi
     stage('Push image to Artifactory') {
       steps {
         script {
+          def artDocker = Artifactory.docker(username, apiKey)
+          
           def dockerInfo = artDocker.push("${dockerRepo}/docker-framework:${env.BUILD_ID}", 'docker-dev-local')
+          
           buildInfo.append(dockerInfo)
+          
           server.publishBuildInfo(buildInfo)
         }
         
@@ -119,5 +121,6 @@ environment {
   bowerUrl = '$server.url/api/bower/bower-dev'
   npmUrl = '$server.url/api/npm/npm-prod'
   server = 'Artifactory.server($artifactoryInstance)'
+  buildInfo = ''
 }
 }
