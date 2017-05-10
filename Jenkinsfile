@@ -22,8 +22,8 @@ pipeline {
     }
     stage('Config environment') {
       steps {
-        sh '''sed -ie 's/ubuntu:5001/dockerRepo/g' docker-framework/DockerFile
-sed -ie 's/ubuntu:5001/dockerRepo/g' docker-framework/framework-test/Dockerfile'''
+        sh '''sed -ie 's/ubuntu:5001/${dockerRepo}/g' docker-framework/DockerFile
+sed -ie 's/ubuntu:5001/${dockerRepo}/g' docker-framework/framework-test/Dockerfile'''
       }
     }
     stage('Build Base Image') {
@@ -44,7 +44,7 @@ sed -ie 's/ubuntu:5001/dockerRepo/g' docker-framework/framework-test/Dockerfile'
           
           def artDocker= Artifactory.docker(username, apiKey)
           
-          docker.build(dockerRepo + "/docker-framework:$buildInfo.number", "-f docker-framework/DockerFile ./docker-framework/")
+          docker.build(dockerRepo + "/docker-framework:${env.BUILD_ID}", "-f docker-framework/DockerFile ./docker-framework/")
         }
         
       }
@@ -52,18 +52,18 @@ sed -ie 's/ubuntu:5001/dockerRepo/g' docker-framework/framework-test/Dockerfile'
     stage('Push image to Artifactory') {
       steps {
         script {
-          def dockerInfo = artDocker.push("$dockerRepo/docker-framework:$buildInfo.number", 'docker-dev-local')
+          def dockerInfo = artDocker.push("${dockerRepo}/docker-framework:${env.BUILD_ID}", 'docker-dev-local')
           buildInfo.append(dockerInfo)
           server.publishBuildInfo(buildInfo)
         }
         
-        sh 'curl -H \'X-JFrog-Art-Api:$params.apiKey\' $server.url/api/docker/docker-dev-local/v2/promote -H "Content-Type:application/json" -d \'{"targetRepo" : "docker-dev-local", "dockerRepository" : "docker-framework", "tag" : "$buildInfo.number", "targetTag" : "latest", "copy": true }\' '
+        sh 'curl -H \'X-JFrog-Art-Api:${apiKey}\' ${server}.url/api/docker/docker-dev-local/v2/promote -H "Content-Type:application/json" -d \'{"targetRepo" : "docker-dev-local", "dockerRepository" : "docker-framework", "tag" : "${env.BUILD_ID}", "targetTag" : "latest", "copy": true }\' '
       }
     }
     stage('Test Image') {
       steps {
         script {
-          def curlstr="curl -H 'X-JFrog-Art-Api:"+password+"' '$server.url"
+          def curlstr="curl -H 'X-JFrog-Art-Api:"+password+"' '${server}.url"
           def jarverstr = curlstr+ "/api/search/latestVersion?g=com.jfrog&a=frogsws&repos=libs-release'"
           
           sh jarverstr +' > docker-app/jar/version.txt'
