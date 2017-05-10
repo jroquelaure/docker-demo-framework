@@ -121,7 +121,7 @@ environment {
   username = 'jenkins'
   dockerRepo = 'ubuntu:5001'
   xray = 'false'
-  authUrl = '$server.url/api/npm/auth'
+  authUrl = 'server.url/api/npm/auth'
   bowerUrl = '$server.url/api/bower/bower-dev'
   npmUrl = '$server.url/api/npm/npm-prod'
   server = 'Artifactory.server($artifactoryInstance)'
