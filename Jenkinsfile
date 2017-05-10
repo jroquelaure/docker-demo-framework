@@ -34,7 +34,9 @@ sed -ie 's/ubuntu:5001/$dockerRepo/g' docker-framework/framework-test/Dockerfile
               }
             ]
           }"""
-          def buildInfo = $server.download(downloadSpec)
+          
+          server = Artifactory.server($artifactoryInstance)
+          def buildInfo = server.download(downloadSpec)
         }
         
         script {
