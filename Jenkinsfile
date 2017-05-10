@@ -10,7 +10,10 @@ pipeline {
             
           },
           "Get sources": {
-            git(url: 'https://github.com/jroquelaure/docker-lifecycle.git', branch: 'master')
+            dir(path: 'tmp') {
+              git(url: 'https://github.com/jroquelaure/docker-lifecycle.git', branch: 'master')
+            }
+            
             
           }
         )
