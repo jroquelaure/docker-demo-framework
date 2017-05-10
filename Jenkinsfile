@@ -12,7 +12,7 @@ pipeline {
           "Get sources": {
             dir(path: 'tmp') {
               git(url: 'https://github.com/jroquelaure/docker-lifecycle.git', branch: 'master')
-              sh 'cp docker-framework ..'
+              sh 'mv docker-framework ..'
             }
             
             
