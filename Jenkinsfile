@@ -74,7 +74,7 @@ sed -ie "s/ubuntu:5001/${dockerRepo}/g" docker-framework/framework-test/Dockerfi
           sh 'cat docker-app/jar/version.txt'
           env.JARVER=readFile('docker-app/jar/version.txt')
           
-          sh "echo '${authUrl}'"
+          sh "echo $server.url/api/npm/auth"
           
           sh "curl -S -u${username}:${apiKey} ${authUrl} > .npmrc"
           
@@ -121,7 +121,7 @@ environment {
   username = 'jenkins'
   dockerRepo = 'ubuntu:5001'
   xray = 'false'
-  authUrl = 'server.url/api/npm/auth'
+  authUrl = '$server.url/api/npm/auth'
   bowerUrl = '$server.url/api/bower/bower-dev'
   npmUrl = '$server.url/api/npm/npm-prod'
   server = 'Artifactory.server($artifactoryInstance)'
