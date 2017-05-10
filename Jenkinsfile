@@ -13,6 +13,7 @@ pipeline {
             dir(path: 'tmp') {
               git(url: 'https://github.com/jroquelaure/docker-lifecycle.git', branch: 'master')
               sh 'mv docker-framework ..'
+              sh 'mv docker-app ..'
             }
             
             
@@ -66,18 +67,18 @@ sed -ie "s/ubuntu:5001/${dockerRepo}/g" docker-framework/framework-test/Dockerfi
     stage('Test Image') {
       steps {
         script {
-          def curlstr="curl -H 'X-JFrog-Art-Api:${apiKey}' '${server}.url"
+          def curlstr="curl -H 'X-JFrog-Art-Api:${apiKey}' '$server.url"
           def jarverstr = curlstr+ "/api/search/latestVersion?g=com.jfrog&a=frogsws&repos=libs-release'"
           
           sh jarverstr +' > docker-app/jar/version.txt'
           sh 'cat docker-app/jar/version.txt'
           env.JARVER=readFile('docker-app/jar/version.txt')
           
-          sh "curl -S -u$username:$password $authUrl > .npmrc"
+          sh "curl -S -u${username}:${apiKey} $authUrl > .npmrc"
           
           sh("""echo '{
             "directory": "app/bower_components",
-            "registry" : "http://$username:$password@$server.url/artifactory/api/bower/bower-dev",
+            "registry" : "http://${username}:${apiKey}@$server.url/artifactory/api/bower/bower-dev",
             "resolvers" : [ "bower-art-resolver" ]
           }' > .bowerrc""".toString())
           
@@ -93,7 +94,7 @@ sed -ie "s/ubuntu:5001/${dockerRepo}/g" docker-framework/framework-test/Dockerfi
           server.download(downloadSpec)
           
           sh "mkdir -p docker-framework/framework-test/ui"
-          sh "curl -u$username:$password \"$server.url/npm-prod/org/jfrog/frogsui/frogsui-\\[RELEASE\\].tgz\" -o docker-framework/framework-test/ui/frogsui.tgz"
+          sh "curl -u${username}:${apiKey} \"$server.url/npm-prod/org/jfrog/frogsui/frogsui-\\[RELEASE\\].tgz\" -o docker-framework/framework-test/ui/frogsui.tgz"
           
           sh "tar -xvzf docker-framework/framework-test/ui/frogsui.tgz -C docker-framework/framework-test/ui/"
           sh "mv docker-framework/framework-test/ui/package docker-framework/framework-test/ui/frogsui"
