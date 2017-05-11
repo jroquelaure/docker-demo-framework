@@ -66,52 +66,61 @@ sed -ie "s/ubuntu:5001/${dockerRepo}/g" docker-framework/framework-test/Dockerfi
     }
     stage('Test Image') {
       steps {
-        script {
-          def curlstr="curl -H 'X-JFrog-Art-Api:${apiKey}' '$server.url"
-          def jarverstr = curlstr+ "/api/search/latestVersion?g=com.jfrog&a=frogsws&repos=libs-release'"
+        parallel(
+          "Test Image": {
+            script {
+              def curlstr="curl -H 'X-JFrog-Art-Api:${apiKey}' '$server.url"
+              def jarverstr = curlstr+ "/api/search/latestVersion?g=com.jfrog&a=frogsws&repos=libs-release'"
+              
+              sh jarverstr +' > docker-app/jar/version.txt'
+              sh 'cat docker-app/jar/version.txt'
+              env.JARVER=readFile('docker-app/jar/version.txt')
+              
+              sh "echo $server.url/api/npm/auth"
+              
+              sh "curl -S -u$username:apiKey $server.url/api/npm/auth > .npmrc"
+              
+              sh("""echo '{
+                "directory": "app/bower_components",
+                "registry" : "http://$username:$apiKey@$server.url/artifactory/api/bower/bower-dev",
+                "resolvers" : [ "bower-art-resolver" ]
+              }' > .bowerrc""".toString())
+              
+              def downloadSpec = """{
+                "files": [
+                  {
+                    "pattern": "libs-release/com/jfrog/frogsws/$env.JARVER/frogsws-$env.JARVER*.jar",
+                    "target": "docker-framework/framework-test/jar/frogsws.jar",
+                    "flat":"true"
+                  }
+                ]
+              }"""
+              server.download(downloadSpec)
+              
+              sh "mkdir -p docker-framework/framework-test/ui"
+              sh "curl -u$username:$apiKey \"$server.url/npm-prod/org/jfrog/frogsui/frogsui-\\[RELEASE\\].tgz\" -o docker-framework/framework-test/ui/frogsui.tgz"
+              
+              sh "tar -xvzf docker-framework/framework-test/ui/frogsui.tgz -C docker-framework/framework-test/ui/"
+              sh "mv docker-framework/framework-test/ui/package docker-framework/framework-test/ui/frogsui"
+              //build framework_test image
+              
+              testApp = docker.build("framework-test:$buildInfo.number", "-f docker-framework/framework-test/Dockerfile ./docker-framework/framework-test/")
+              //run it
+              testApp.withRun('-p 8099:8000 -p 9000:9000') { c ->
+              sleep 10
+              sh 'curl "localhost:8099/frogsui/app/index.html"'
+            }
+            sh "docker rmi " + dockerRepo + "/docker-framework:$buildInfo.number"
+            sh "docker rmi " + dockerRepo + "/docker-framework:latest"
+          }
           
-          sh jarverstr +' > docker-app/jar/version.txt'
-          sh 'cat docker-app/jar/version.txt'
-          env.JARVER=readFile('docker-app/jar/version.txt')
           
-          sh "echo $server.url/api/npm/auth"
+        },
+        "": {
+          build 'framework-integration'
           
-          sh "curl -S -u$username:apiKey $server.url/api/npm/auth > .npmrc"
-          
-          sh("""echo '{
-            "directory": "app/bower_components",
-            "registry" : "http://$username:$apiKey@$server.url/artifactory/api/bower/bower-dev",
-            "resolvers" : [ "bower-art-resolver" ]
-          }' > .bowerrc""".toString())
-          
-          def downloadSpec = """{
-            "files": [
-              {
-                "pattern": "libs-release/com/jfrog/frogsws/$env.JARVER/frogsws-$env.JARVER*.jar",
-                "target": "docker-framework/framework-test/jar/frogsws.jar",
-                "flat":"true"
-              }
-            ]
-          }"""
-          server.download(downloadSpec)
-          
-          sh "mkdir -p docker-framework/framework-test/ui"
-          sh "curl -u$username:$apiKey \"$server.url/npm-prod/org/jfrog/frogsui/frogsui-\\[RELEASE\\].tgz\" -o docker-framework/framework-test/ui/frogsui.tgz"
-          
-          sh "tar -xvzf docker-framework/framework-test/ui/frogsui.tgz -C docker-framework/framework-test/ui/"
-          sh "mv docker-framework/framework-test/ui/package docker-framework/framework-test/ui/frogsui"
-          //build framework_test image
-          
-          testApp = docker.build("framework-test:$buildInfo.number", "-f docker-framework/framework-test/Dockerfile ./docker-framework/framework-test/")
-          //run it
-          testApp.withRun('-p 8099:8000 -p 9000:9000') { c ->
-          sleep 10
-          sh 'curl "localhost:8099/frogsui/app/index.html"'
         }
-        sh "docker rmi " + dockerRepo + "/docker-framework:$buildInfo.number"
-        sh "docker rmi " + dockerRepo + "/docker-framework:latest"
-      }
-      
+      )
     }
   }
 }
