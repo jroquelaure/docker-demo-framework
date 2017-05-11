@@ -112,6 +112,14 @@ sed -ie "s/ubuntu:5001/${dockerRepo}/g" docker-framework/framework-test/Dockerfi
         sh "docker rmi " + dockerRepo + "/docker-framework:latest"
       }
       
+      script {
+        docker.image('ubuntu:5001/ruby:2.3.1').inside {
+          stage("Install Bundler") {
+            sh "gem install bundler --no-rdoc --no-ri"
+          }
+        }
+      }
+      
     }
   }
 }
